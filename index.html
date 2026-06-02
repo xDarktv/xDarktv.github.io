@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dark — Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080809;--bg2:#0f0f12;--bg3:#16161b;--bg4:#1c1c23;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.12);
+  --accent:#00e5a0;--accent2:#7b61ff;--accent3:#ff6b6b;
+  --text:#efefef;--muted:#666;--muted2:#999;
+  --mono:'Space Mono',monospace;--sans:'Syne',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);overflow-x:hidden}
+#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:0.35}
+nav{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:0 2rem;height:58px;background:rgba(8,8,9,0.8);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:var(--mono);font-size:12px;color:var(--accent);letter-spacing:.1em}
+.nav-links{display:flex;gap:1.8rem}
+.nav-links a{color:var(--muted2);font-family:var(--mono);font-size:11px;text-decoration:none;letter-spacing:.08em;transition:color .2s}
+.nav-links a:hover{color:var(--accent)}
+.nav-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.7)}}
+.wrapper{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 2rem}
+.hero{padding:6rem 0 5rem;border-bottom:1px solid var(--border)}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:11px;color:var(--accent);letter-spacing:.12em;margin-bottom:2rem;}
+.hero-eyebrow span{width:24px;height:1px;background:var(--accent)}
+.hero h1{font-size:clamp(3.5rem,9vw,6.5rem);font-weight:800;line-height:1;letter-spacing:-.03em;margin-bottom:.5rem;background:linear-gradient(135deg,#fff 0%,#aaa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero h1 .accent{background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text}
+.hero-roles{display:flex;gap:.75rem;flex-wrap:wrap;margin-bottom:2rem;margin-top:1rem;}
+.role-pill{font-family:var(--mono);font-size:10px;letter-spacing:.1em;padding:5px 12px;border-radius:20px;border:1px solid var(--border2);color:var(--muted2);transition:all .3s;cursor:default;}
+.role-pill:hover{border-color:var(--accent);color:var(--accent);background:rgba(0,229,160,.05)}
+.role-pill.active{border-color:var(--accent);color:var(--accent);background:rgba(0,229,160,.08)}
+.hero-desc{font-size:15px;color:rgba(239,239,239,.6);max-width:500px;line-height:1.8;margin-bottom:2.5rem}
+.hero-desc em{color:var(--accent);font-style:normal;font-weight:700}
+.cta-row{display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:6px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-decoration:none;cursor:pointer;transition:all .25s;border:1px solid transparent}
+.btn-primary{background:var(--accent);color:#000;font-weight:700}
+.btn-primary:hover{background:#00ffc8;transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--muted2);border-color:var(--border2)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.hero-stats{display:flex;gap:2rem;margin-left:1rem}
+.stat{text-align:center}
+.stat-num{font-size:1.5rem;font-weight:800;color:var(--accent);display:block}
+.stat-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.08em}
+.section{padding:4rem 0;border-bottom:1px solid var(--border)}
+.sec-label{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.15em;margin-bottom:.4rem}
+.sec-title{font-size:1.7rem;font-weight:800;margin-bottom:2.5rem;letter-spacing:-.02em}
+.sec-title span{color:var(--accent)}
+.skills-list{display:grid;gap:.75rem}
+.skill-row{display:flex;align-items:center;gap:1rem;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;transition:border-color .2s,transform .2s;}
+.skill-row:hover{border-color:var(--border2);transform:translateX(4px)}
+.skill-emoji{font-size:1.2rem;width:28px;flex-shrink:0}
+.skill-info{flex:1}
+.skill-name{font-size:14px;font-weight:700;margin-bottom:2px}
+.skill-tag{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.06em}
+.skill-bar{width:140px;height:4px;background:var(--bg4);border-radius:2px;overflow:hidden;flex-shrink:0}
+.skill-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.skill-pct{font-family:var(--mono);font-size:10px;color:var(--muted);width:32px;text-align:right;flex-shrink:0}
+.proj-grid{display:grid;gap:1.25rem}
+.proj-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.75rem;position:relative;overflow:hidden;transition:border-color .3s,transform .3s;}
+.proj-card:hover{border-color:rgba(0,229,160,.25);transform:translateY(-3px)}
+.proj-glow{position:absolute;top:-60px;right:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(0,229,160,.08) 0%,transparent 70%);pointer-events:none;}
+.proj-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;flex-wrap:wrap;gap:.5rem}
+.proj-title{font-size:1.1rem;font-weight:800}
+.proj-badges{display:flex;gap:.5rem;flex-wrap:wrap}
+.badge{font-family:var(--mono);font-size:9px;letter-spacing:.1em;padding:4px 9px;border-radius:4px}
+.badge-green{background:rgba(0,229,160,.1);border:1px solid rgba(0,229,160,.2);color:var(--accent)}
+.badge-purple{background:rgba(123,97,255,.1);border:1px solid rgba(123,97,255,.2);color:var(--accent2)}
+.badge-red{background:rgba(255,107,107,.1);border:1px solid rgba(255,107,107,.2);color:var(--accent3)}
+.proj-desc{font-size:13px;color:rgba(239,239,239,.6);line-height:1.7;margin-bottom:1.25rem}
+.proj-tags{display:flex;gap:.5rem;flex-wrap:wrap}
+.ptag{font-family:var(--mono);font-size:10px;color:var(--muted);background:var(--bg3);border:1px solid var(--border);padding:4px 9px;border-radius:4px}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.about-box{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+.about-box h3{font-size:14px;font-weight:700;margin-bottom:.75rem;color:var(--accent)}
+.about-box p{font-size:13px;color:rgba(239,239,239,.6);line-height:1.75}
+@media(max-width:580px){.about-grid{grid-template-columns:1fr}}
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+.contact-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.5rem;text-decoration:none;color:var(--text);display:flex;align-items:center;gap:14px;transition:all .25s;}
+.contact-card:hover{border-color:var(--accent);transform:translateY(-2px);background:var(--bg3)}
+.contact-card:hover .contact-name{color:var(--accent)}
+.contact-icon{font-size:1.4rem;flex-shrink:0}
+.contact-platform{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.08em;margin-bottom:2px}
+.contact-name{font-size:14px;font-weight:700;transition:color .25s}
+.contact-arrow{margin-left:auto;font-size:1rem;color:var(--muted);transition:transform .25s}
+.contact-card:hover .contact-arrow{transform:translateX(3px);color:var(--accent)}
+.terminal{background:#0d0d10;border:1px solid var(--border2);border-radius:10px;overflow:hidden;margin-top:1.5rem;}
+.term-bar{background:var(--bg3);padding:.6rem 1rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--border);}
+.dot{width:10px;height:10px;border-radius:50%}
+.dot-r{background:#ff5f56}.dot-y{background:#ffbd2e}.dot-g{background:#27c93f}
+.term-body{padding:1.25rem;font-family:var(--mono);font-size:12px;line-height:2}
+.term-line{display:block}
+.term-prompt{color:var(--accent)}
+.term-cmd{color:var(--text)}
+.term-out{color:var(--muted2)}
+.term-val{color:var(--accent2)}
+.term-cursor{display:inline-block;width:8px;height:14px;background:var(--accent);animation:blink 1.1s step-end infinite;vertical-align:middle}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+footer{text-align:center;padding:2.5rem 2rem;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.06em;position:relative;z-index:1}
+footer span{color:var(--accent)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.hero{animation:fadeUp .7s ease both}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<nav>
+  <span class="nav-logo"><span class="nav-dot"></span> &nbsp;~/dark</span>
+  <div class="nav-links">
+    <a href="#about">Sobre mí</a>
+    <a href="#skills">Skills</a>
+    <a href="#projects">Proyectos</a>
+    <a href="#contact">Contacto</a>
+  </div>
+</nav>
+
+<div class="wrapper">
+
+  <div class="hero">
+    <div class="hero-eyebrow"><span></span>DISPONIBLE PARA PROYECTOS</div>
+    <h1><span class="accent">Dark</span></h1>
+    <div class="hero-roles">
+      <span class="role-pill active">⚡ Founder</span>
+      <span class="role-pill">🔧 Developer</span>
+      <span class="role-pill">👥 Staff Manager</span>
+      <span class="role-pill">🖥️ Server Config</span>
+    </div>
+    <p class="hero-desc">
+      Configurador de servidores <em>Minecraft</em> especializado en <em>Survival</em>. Fundador, dev y manager — construyo experiencias de juego únicas y lidero equipos hacia la excelencia.
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="#projects">Ver proyectos →</a>
+      <a class="btn btn-ghost" href="#contact">Contacto</a>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">1+</span><span class="stat-label">NETWORK</span></div>
+        <div class="stat"><span class="stat-num">∞</span><span class="stat-label">CONFIGS</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="about">
+    <p class="sec-label">// 01 sobre mí</p>
+    <h2 class="sec-title">Quién soy <span>.</span></h2>
+    <div class="about-grid">
+      <div class="about-box">
+        <h3>// Origen</h3>
+        <p>Empecé como jugador apasionado de Minecraft y terminé construyendo servidores. Hoy me dedico a configurar, optimizar y liderar redes de juego con un equipo comprometido.</p>
+      </div>
+      <div class="about-box">
+        <h3>// Visión</h3>
+        <p>Quiero crecer como Developer y Configurador profesional, llevar MinEcuador al siguiente nivel y demostrar que desde Ecuador se puede construir algo grande.</p>
+      </div>
+      <div class="about-box">
+        <h3>// Liderazgo</h3>
+        <p>Gestor de staff con experiencia coordinando equipos, asignando roles y manteniendo la administración fluida de múltiples modalidades en simultáneo.</p>
+      </div>
+      <div class="about-box">
+        <h3>// Aprendizaje</h3>
+        <p>En constante crecimiento: aprendiendo más sobre configuración avanzada, desarrollo con Node.js y mejores prácticas para administrar servidores a gran escala.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="skills">
+    <p class="sec-label">// 02 habilidades</p>
+    <h2 class="sec-title">Stack & Skills <span>.</span></h2>
+    <div class="skills-list">
+      <div class="skill-row">
+        <div class="skill-emoji">🖥️</div>
+        <div class="skill-info"><div class="skill-name">Configuración Survival</div><div class="skill-tag">especialidad principal</div></div>
+        <div class="skill-bar"><div class="skill-fill" style="width:93%"></div></div>
+        <div class="skill-pct">93%</div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-emoji">🔧</div>
+        <div class="skill-info"><div class="skill-name">Plugins Minecraft</div><div class="skill-tag">config & gestión</div></div>
+        <div class="skill-bar"><div class="skill-fill" style="width:87%"></div></div>
+        <div class="skill-pct">87%</div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-emoji">👥</div>
+        <div class="skill-info"><div class="skill-name">Gestión de Equipos</div><div class="skill-tag">staff management</div></div>
+        <div class="skill-bar"><div class="skill-fill" style="width:82%"></div></div>
+        <div class="skill-pct">82%</div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-emoji">🟢</div>
+        <div class="skill-info"><div class="skill-name">Node.js</div><div class="skill-tag">en aprendizaje activo</div></div>
+        <div class="skill-bar"><div class="skill-fill" style="width:60%"></div></div>
+        <div class="skill-pct">60%</div>
+      </div>
+      <div class="skill-row">
+        <div class="skill-emoji">⚙️</div>
+        <div class="skill-info"><div class="skill-name">Administración de Servidores</div><div class="skill-tag">rendimiento & estabilidad</div></div>
+        <div class="skill-bar"><div class="skill-fill" style="width:78%"></div></div>
+        <div class="skill-pct">78%</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="projects">
+    <p class="sec-label">// 03 proyectos</p>
+    <h2 class="sec-title">Proyectos <span>.</span></h2>
+    <div class="proj-grid">
+      <div class="proj-card">
+        <div class="proj-glow"></div>
+        <div class="proj-top">
+          <span class="proj-title">MinEcuador Network</span>
+          <div class="proj-badges">
+            <span class="badge badge-green">FUNDADOR</span>
+            <span class="badge badge-purple">ACTIVO</span>
+          </div>
+        </div>
+        <p class="proj-desc">Red de servidores Minecraft creada junto a amigos, con administración profesional y gestión optimizada del rendimiento de cada modalidad. Proyecto enfocado en brindar la mejor experiencia de juego a la comunidad ecuatoriana, con un equipo de staff coordinado y modalidades bien definidas.</p>
+        <div class="proj-tags">
+          <span class="ptag">Minecraft</span><span class="ptag">Survival</span><span class="ptag">Plugins</span><span class="ptag">Staff Manager</span><span class="ptag">Node.js</span><span class="ptag">Ecuador</span>
+        </div>
+      </div>
+      <div class="proj-card" style="border-style:dashed;opacity:.6">
+        <div class="proj-top">
+          <span class="proj-title">Próximamente...</span>
+          <div class="proj-badges"><span class="badge badge-red">EN DESARROLLO</span></div>
+        </div>
+        <p class="proj-desc">Nuevos proyectos en camino. El crecimiento no se detiene.</p>
+      </div>
+    </div>
+    <div class="terminal">
+      <div class="term-bar">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <span style="font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:8px">dark@minecuador ~ bash</span>
+      </div>
+      <div class="term-body">
+        <span class="term-line"><span class="term-prompt">dark@minecuador</span><span class="term-cmd"> $ whoami</span></span>
+        <span class="term-line term-out">→ Founder · Developer · Staff Manager</span>
+        <span class="term-line"><span class="term-prompt">dark@minecuador</span><span class="term-cmd"> $ cat status.txt</span></span>
+        <span class="term-line term-out">→ Disponible para nuevos proyectos &amp; colaboraciones</span>
+        <span class="term-line"><span class="term-prompt">dark@minecuador</span><span class="term-cmd"> $ echo $LOCATION</span></span>
+        <span class="term-line"><span class="term-val">Ecuador 🇪🇨</span></span>
+        <span class="term-line"><span class="term-prompt">dark@minecuador</span><span class="term-cmd"> $ <span class="term-cursor"></span></span></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="contact">
+    <p class="sec-label">// 04 contacto</p>
+    <h2 class="sec-title">Encuéntrame <span>.</span></h2>
+    <div class="contact-grid">
+      <a class="contact-card" href="#" target="_blank">
+        <div class="contact-icon">💬</div>
+        <div>
+          <div class="contact-platform">DISCORD</div>
+          <div class="contact-name">.xdarktv_</div>
+        </div>
+        <div class="contact-arrow">→</div>
+      </a>
+      <a class="contact-card" href="https://tiktok.com/@minecuador_oficial" target="_blank">
+        <div class="contact-icon">🎵</div>
+        <div>
+          <div class="contact-platform">TIKTOK</div>
+          <div class="contact-name">@minecuador_oficial</div>
+        </div>
+        <div class="contact-arrow">→</div>
+      </a>
+      <a class="contact-card" href="https://www.instagram.com/minecuador_oficial/" target="_blank">
+        <div class="contact-icon">📸</div>
+        <div>
+          <div class="contact-platform">INSTAGRAM</div>
+          <div class="contact-name">@minecuador_oficial</div>
+        </div>
+        <div class="contact-arrow">→</div>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<footer>© 2026 <span>Dark</span> · MinEcuador Network · Hecho con 💚 desde Ecuador 🇪🇨</footer>
+
+<script>
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+function initParticles() {
+  particles = [];
+  const count = Math.floor((W * H) / 14000);
+  for (let i = 0; i < count; i++) {
+    particles.push({ x: Math.random()*W, y: Math.random()*H, vx:(Math.random()-.5)*.3, vy:(Math.random()-.5)*.3, r:Math.random()*1.5+.5, opacity:Math.random()*.5+.1 });
+  }
+}
+function draw() {
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle='#00e5a0';
+  particles.forEach(p => {
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0)p.x=W; if(p.x>W)p.x=0; if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+    ctx.globalAlpha=p.opacity;
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+  });
+  ctx.strokeStyle='#00e5a0';
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<100){ ctx.globalAlpha=(1-dist/100)*.12; ctx.lineWidth=.5; ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y); ctx.lineTo(particles[j].x,particles[j].y); ctx.stroke(); }
+    }
+  }
+  ctx.globalAlpha=1;
+  requestAnimationFrame(draw);
+}
+resize(); initParticles(); draw();
+window.addEventListener('resize',()=>{resize();initParticles();});
+document.querySelectorAll('.role-pill').forEach(pill => {
+  pill.addEventListener('click', function() {
+    document.querySelectorAll('.role-pill').forEach(p=>p.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting){ e.target.style.animation='fadeUp .6s ease both'; observer.unobserve(e.target); } });
+},{threshold:.1});
+document.querySelectorAll('.section,.proj-card,.skill-row,.contact-card,.about-box').forEach(el=>{
+  el.style.opacity='0'; observer.observe(el);
+});
+</script>
+</body>
+</html>
